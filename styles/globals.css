@@ -1,0 +1,33 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ✅ Custom global styles */
+@layer base {
+  html,
+  body {
+    @apply bg-gray-950 text-gray-300 transition-colors duration-300;
+  }
+
+  /* Optional: smooth font + antialiasing */
+  body {
+    @apply font-sans antialiased;
+  }
+
+  /* 2. Accent Color for Links/Focus: Changed from Cyan to Orange */
+  a {
+    @apply text-orange-400 hover:text-orange-300; /* ⬅️ CHANGED TO ORANGE */
+  }
+
+  /* ✅ Light theme override (optional) */
+  @media (prefers-color-scheme: light) {
+    html,
+    body {
+      @apply bg-gray-50 text-gray-800;
+    }
+
+    a {
+      @apply text-orange-600 hover:text-orange-700; /* ⬅️ CHANGED TO ORANGE */
+    }
+  }
+}
