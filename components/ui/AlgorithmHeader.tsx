@@ -1,17 +1,25 @@
-import React from 'react'
+import React from "react";
 
-function AlgorithmHeader({name, children}: {name: string, children: React.ReactNode}) {
+function AlgorithmHeader({
+  name,
+  children,
+}: {
+  name: string;
+  children: React.ReactNode;
+}) {
   return (
     <>
-        <div className='font-extrabold text-4xl sm:text-5xl lg:text-6xl text-center pt-24 md:pt-32'>
-            {name}
-        </div>
+      {/* 1. Main Heading: Changed from invisible white/light-gray to **Dark Gray (text-gray-800)** */}
+      <div className="font-extrabold text-4xl sm:text-5xl lg:text-6xl text-center pt-24 md:pt-32 **text-gray-800**">
+        {name}
+      </div>
 
-        <div className='px-2 py-12 text-slate-400 max-w-5xl m-auto'>
-            {children}
-        </div>
+      {/* 2. Subtext/Children: Changed from light slate (text-slate-400) to **Slightly Lighter Dark Gray (text-gray-600)** for contrast */}
+      <div className="px-2 py-12 **text-gray-600** max-w-5xl m-auto text-center">
+        {children}
+      </div>
     </>
-  )
+  );
 }
 
-export default AlgorithmHeader
+export default AlgorithmHeader;
