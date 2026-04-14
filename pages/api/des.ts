@@ -3,40 +3,50 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import * as Constants from '../../utils/constants'
 import CryptoJS from 'crypto-js'
 
+const readParam = (value: string | string[] | undefined): string => {
+    if(Array.isArray(value)) return value[0] ?? ''
+    return value ?? ''
+}
+
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
     if(req.method == 'GET'){
         const query = req.query
         const {plaintext, key, mode, triple, ciphertext, iv} = query
+        const plaintextValue = readParam(plaintext)
+        const keyValue = readParam(key)
+        const modeValue = readParam(mode) || 'ECB'
+        const ciphertextValue = readParam(ciphertext)
+        const ivValue = readParam(iv)
         const cryptoObj = triple === 'true' ? CryptoJS.TripleDES : CryptoJS.DES
         
-        if(mode && !Constants.modesMap.has(mode.toString())){
+        if(modeValue && !Constants.modesMap.has(modeValue)){
             res.status(400).send({
-                message: `Specified mode '${mode}' not supported by DES`
+                message: `Specified mode '${modeValue}' not supported by DES`
             })
         }else{
-            const keyHex = CryptoJS.enc.Utf8.parse(key)
-            const ivHex = iv ? CryptoJS.enc.Hex.parse(CryptoJS.enc.Utf8.parse(iv).toString(CryptoJS.enc.Hex)) 
+            const keyHex = CryptoJS.enc.Utf8.parse(keyValue)
+            const ivHex = ivValue ? CryptoJS.enc.Hex.parse(CryptoJS.enc.Utf8.parse(ivValue).toString(CryptoJS.enc.Hex)) 
                             : CryptoJS.enc.Hex.parse('0000')
-            const modeObj = Constants.modesMap.get(mode.toString() ?? 'ECB')
+            const modeObj = Constants.modesMap.get(modeValue) ?? Constants.modesMap.get('ECB')
             
             try{
-                if(!ciphertext){ //we have to encrypt
-                    const encrypted = cryptoObj.encrypt(plaintext, keyHex, {
+                if(!ciphertextValue){ //we have to encrypt
+                    const encrypted = cryptoObj.encrypt(plaintextValue, keyHex, {
                         iv: ivHex,
                         mode: modeObj,
                         padding: CryptoJS.pad.Pkcs7
                     })
         
                     res.status(200).json({ 
-                        'plaintext': plaintext, 
-                        'key': key, 
+                        'plaintext': plaintextValue, 
+                        'key': keyValue, 
                         'ciphertext': encrypted.ciphertext.toString(),
-                        'mode': mode ?? 'ECB',
+                        'mode': modeValue,
                         'padding': 'Pkcs7'
                     })
                 }else{ //we have to decrypt
                     const decrypted = cryptoObj.decrypt({
-                        ciphertext: CryptoJS.enc.Hex.parse(ciphertext)
+                        ciphertext: CryptoJS.enc.Hex.parse(ciphertextValue)
                     }, keyHex, {
                         iv: ivHex,
                         mode: modeObj,
@@ -45,9 +55,9 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     
                     res.status(200).json({
                         'plaintext': decrypted.toString(CryptoJS.enc.Utf8),
-                        'key': key,
-                        'ciphertext': ciphertext,
-                        'mode': mode ?? 'ECB',
+                        'key': keyValue,
+                        'ciphertext': ciphertextValue,
+                        'mode': modeValue,
                         'padding': 'Pkcs7'
                     })
                 }

@@ -51,3 +51,12 @@ Start the application on your computer:
 ```bash
 npm run dev
 ```
+
+## ✨ Recent Optimization & UI Improvements
+
+- Unified app metadata handling using the App Router metadata API.
+- Consolidated global styling into a single source (`/styles/globals.css`) with reusable design tokens.
+- Standardized cards, form controls, and button styles across all algorithm pages.
+- Improved accessibility with stronger contrast, focus states, labels, and disabled/loading states.
+- Hardened API route query parsing for safer request handling and stricter TypeScript compatibility.
+- Fixed multiple build blockers and updated project config to be compatible with the current Next.js setup.

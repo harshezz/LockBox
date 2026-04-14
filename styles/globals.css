@@ -33,7 +33,7 @@
   input,
   textarea,
   select {
-    @apply text-slate-100 rounded-lg px-3 py-2 bg-slate-950 border border-slate-600;
+    @apply text-slate-100 rounded-lg px-3 py-2 bg-slate-900 border border-slate-600;
     transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
   }
 
@@ -51,7 +51,7 @@
 
 @layer components {
   .card-link {
-    @apply block rounded-2xl border-2 border-slate-700 bg-slate-950/70 px-5 py-4 text-slate-300 transition-all duration-200 hover:-translate-y-0.5 hover:border-sky-400 hover:text-slate-50 hover:shadow-[0_12px_35px_rgba(2,6,23,0.65)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
+    @apply block rounded-2xl border-2 border-slate-700 bg-slate-900 px-5 py-4 text-slate-300 transition-all duration-200 hover:-translate-y-0.5 hover:border-sky-400 hover:text-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
   }
 
   .card-link-header {
@@ -71,15 +71,15 @@
   }
 
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 min-h-10 px-8 py-2 rounded-lg border border-slate-500 bg-slate-800 text-slate-100 font-medium transition-all duration-200 hover:bg-sky-500 hover:border-sky-400 hover:text-slate-950 disabled:opacity-65 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center gap-2 h-10 px-8 py-2 rounded-lg border border-slate-500 bg-slate-800 text-slate-100 font-medium transition-all duration-200 hover:bg-sky-500 hover:border-sky-400 hover:text-slate-900 disabled:opacity-60 disabled:cursor-not-allowed;
   }
 
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 min-h-10 px-8 py-2 rounded-lg border border-slate-600 bg-transparent text-slate-100 font-medium transition-all duration-200 hover:bg-slate-800/80 disabled:opacity-65 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center gap-2 h-10 px-8 py-2 rounded-lg border border-slate-600 bg-transparent text-slate-100 font-medium transition-all duration-200 hover:bg-slate-800 disabled:opacity-60 disabled:cursor-not-allowed;
   }
 
   .section-shell {
-    @apply max-w-5xl m-auto rounded-2xl border border-slate-800 bg-slate-950/35 p-3 md:p-8;
+    @apply max-w-5xl m-auto rounded-2xl border border-slate-800 bg-slate-900 p-3 md:p-8;
   }
 
   .error-text {

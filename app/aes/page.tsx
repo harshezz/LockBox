@@ -1,6 +1,5 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import Layout from "../../components/layout/Layout";
 import AlgorithmHeader from "../../components/ui/AlgorithmHeader";
@@ -15,17 +14,16 @@ type Event = {
 };
 
 export default function AES() {
-  const searchParams = useSearchParams();
-  const searchBits: string | null = searchParams?.get("bits") ?? null;
   const [variant, setVariant] = useState<string>("128");
 
   useEffect(() => {
+    const searchBits = new URLSearchParams(window.location.search).get("bits");
     if (!searchBits) return;
     const bits = Constants.AESVariants.includes(searchBits)
       ? searchBits
       : Constants.AESVariants[0];
     setVariant(bits);
-  }, [searchBits]);
+  }, []);
 
   const [ciphertext, setCiphertext] = useState<string>("");
   const [plaintext, setPlaintext] = useState<string>("");

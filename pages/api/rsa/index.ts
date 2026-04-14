@@ -1,83 +1,88 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import rsa from "node-rsa";
 
+const readParam = (value: string | string[] | undefined): string => {
+  if (Array.isArray(value)) return value[0] ?? "";
+  return value ?? "";
+};
+
+const decodeParam = (value: string): string =>
+  decodeURIComponent(value).replace(/%2b/g, "+");
+
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method == "GET") {
     try {
-      let { plaintext, ciphertext, publicKey, privateKey } = req.query;
-      let publicKeyObj: rsa;
-      let privateKeyObj: rsa;
-
-      plaintext = plaintext ? plaintext.toString() : null;
-      ciphertext = ciphertext ? ciphertext.toString() : null;
-      publicKey = publicKey ? publicKey.toString() : null;
-      privateKey = privateKey ? privateKey.toString() : null;
-
-      if (plaintext) plaintext = decodeURI(plaintext).replace(/%2b/g, "+");
-      if (ciphertext) ciphertext = decodeURI(ciphertext).replace(/%2b/g, "+");
+      const plaintext = readParam(req.query.plaintext);
+      const ciphertext = readParam(req.query.ciphertext);
+      const publicKey = readParam(req.query.publicKey);
+      const privateKey = readParam(req.query.privateKey);
 
       if (!plaintext && !ciphertext) {
-        res.status(400).send({
+        return res.status(400).send({
           message: "You must specify either plaintext or ciphertext",
         });
-      } else if (publicKey && privateKey) {
-        res.status(400).send({
+      }
+
+      if (publicKey && privateKey) {
+        return res.status(400).send({
           message: "You must specify either private or public key",
         });
-      } else if (publicKey) {
-        publicKeyObj = new rsa().importKey(
-          decodeURI(publicKey).replace(/%2b/g, "+")
-        );
+      }
+
+      if (publicKey) {
+        const publicKeyObj = new rsa().importKey(decodeParam(publicKey));
 
         if (plaintext) {
-          //We have to public encrypt
-          res.status(200).json({
-            plaintext: plaintext,
-            ciphertext: publicKeyObj.encrypt(plaintext, "base64"),
-            publicKey: publicKeyObj.exportKey("public"),
-          });
-        } else if (ciphertext) {
-          //We have to public decrypt
-          res.status(200).json({
-            plaintext: publicKeyObj.decryptPublic(ciphertext, "utf8"),
-            ciphertext: ciphertext,
+          return res.status(200).json({
+            plaintext: decodeParam(plaintext),
+            ciphertext: publicKeyObj.encrypt(decodeParam(plaintext), "base64"),
             publicKey: publicKeyObj.exportKey("public"),
           });
         }
-      } else if (privateKey) {
-        privateKeyObj = new rsa().importKey(
-          decodeURI(privateKey).replace(/%2b/g, "+")
-        );
 
-        if (plaintext) {
-          //We have to private encrypt
-          res.status(200).json({
-            plaintext: plaintext,
-            ciphertext: privateKeyObj.encryptPrivate(plaintext, "base64"),
-            privateKey: privateKeyObj.exportKey("private"),
-          });
-        } else if (ciphertext) {
-          //We have to private decrypt
-          res.status(200).json({
-            plaintext: privateKeyObj.decrypt(ciphertext, "utf8"),
-            ciphertext: ciphertext,
-            privateKey: privateKeyObj.exportKey("private"),
-          });
-        }
-      } else {
-        res.status(400).send({
-          message: "No key specified",
+        return res.status(200).json({
+          plaintext: publicKeyObj.decryptPublic(decodeParam(ciphertext), "utf8"),
+          ciphertext: decodeParam(ciphertext),
+          publicKey: publicKeyObj.exportKey("public"),
         });
       }
+
+      if (privateKey) {
+        const privateKeyObj = new rsa().importKey(decodeParam(privateKey));
+
+        if (plaintext) {
+          return res.status(200).json({
+            plaintext: decodeParam(plaintext),
+            ciphertext: privateKeyObj.encryptPrivate(
+              decodeParam(plaintext),
+              "base64"
+            ),
+            privateKey: privateKeyObj.exportKey("private"),
+          });
+        }
+
+        return res.status(200).json({
+          plaintext: privateKeyObj.decrypt(decodeParam(ciphertext), "utf8"),
+          ciphertext: decodeParam(ciphertext),
+          privateKey: privateKeyObj.exportKey("private"),
+        });
+      }
+
+      return res.status(400).send({
+        message: "No key specified",
+      });
     } catch (error) {
-      res.status(500).send({
-        message: error.toString(),
+      return res.status(500).send({
+        message: error instanceof Error ? error.message : String(error),
       });
     }
   } else if (req.method == "POST") {
-    res.status(405).json({
+    return res.status(405).json({
       message: "Method POST Not Allowed",
     });
   }
+
+  return res.status(405).json({
+    message: `Method ${req.method} Not Allowed`,
+  });
 }
-z;

@@ -1,6 +1,5 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import Layout from "../../components/layout/Layout";
 import AlgorithmHeader from "../../components/ui/AlgorithmHeader";
@@ -14,15 +13,13 @@ import * as Constants from "../../utils/constants";
 // }
 
 export default function DES() {
-  const searchParams = useSearchParams();
-  const isTriple: string | null = searchParams?.get("triple") ?? null;
-
   const [triple, setTriple] = useState<boolean>(false);
 
   useEffect(() => {
+    const isTriple = new URLSearchParams(window.location.search).get("triple");
     if (!isTriple) return;
     setTriple(isTriple == "true");
-  }, [isTriple]);
+  }, []);
 
   const [ciphertext, setCiphertext] = useState<string>("");
   const [plaintext, setPlaintext] = useState<string>("");

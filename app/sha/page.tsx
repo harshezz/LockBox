@@ -1,6 +1,5 @@
 "use client";
 
-import { useSearchParams } from "next/navigation";
 import { SetStateAction, useEffect, useState } from "react";
 import Layout from "../../components/layout/Layout";
 import AlgorithmHeader from "../../components/ui/AlgorithmHeader";
@@ -8,19 +7,18 @@ import ErrorMessage from "../../components/ui/ErrorMessage";
 import Loader from "../../components/ui/Loader";
 import * as Constants from "../../utils/constants";
 
-  export default function SHA() {
-  const searchParams = useSearchParams();
-  const searchV: string | null = searchParams?.get("v") ?? null;
+export default function SHA() {
   const [shaVariant, setShaVariant] = useState<string>(Constants.SHAVariants[0]);
 
   useEffect(() => {
+    const searchV = new URLSearchParams(window.location.search).get("v");
     if (!searchV) return;
     setShaVariant(
       Constants.SHAVariants.includes(searchV)
         ? searchV
         : Constants.SHAVariants[1]
     );
-  }, [searchV]);
+  }, []);
 
   const [plaintext, setPlaintext] = useState<string>("");
   const [hash, setHash] = useState<string>("");
