@@ -19,23 +19,23 @@ type Props = {
 
 export default function SymmetricEncryptionCard({destination, shortName, name, keyBits, securityLevel}: Props) {
   return (
-    <Link href={destination}> 
-        <div className='cursor-pointer border-solid border-2 rounded-2xl border-slate-600 hover:border-slate-400 mb-10 px-5 py-4 text-slate-500 hover:text-slate-50 ease-linear duration-200'>
-            <div className='relative border-solid border-b-[1px] pb-3 border-slate-700 '>
+    <Link href={destination} className="card-link"> 
+        <article>
+            <div className='card-link-header'>
                 <LockIcon />
 
-                <div className='inline font-bold text-xl pl-3 border-solid border-l-[1px] border-slate-700 align-middle'>
+                <div className='card-link-title'>
                     {shortName}
                 </div>
 
                 <RightArrowIcon />
             </div>
 
-            <div className='my-3 font-semibold'>
+            <div className='my-3 font-semibold text-slate-100'>
                 {name}
             </div>
 
-            <div className=' font-semibold'>
+            <div className='font-semibold text-slate-300'>
                 <div className='mb-2'>
                     <KeyIcon />
 
@@ -56,7 +56,7 @@ export default function SymmetricEncryptionCard({destination, shortName, name, k
                     <span className='align-middle'>Symmetric</span>
                 </div>
             </div>
-        </div>
+        </article>
     </Link>
   )
 }

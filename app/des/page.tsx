@@ -15,7 +15,7 @@ import * as Constants from "../../utils/constants";
 
 export default function DES() {
   const searchParams = useSearchParams();
-  const isTriple: string = searchParams.get("triple");
+  const isTriple: string | null = searchParams?.get("triple") ?? null;
 
   const [triple, setTriple] = useState<boolean>(false);
 
@@ -36,16 +36,19 @@ export default function DES() {
     string | JSX.Element
   >("Decrypt");
   const [errorMessage, setErrorMessage] = useState<string | JSX.Element>("");
+  const [isEncrypting, setIsEncrypting] = useState<boolean>(false);
+  const [isDecrypting, setIsDecrypting] = useState<boolean>(false);
 
   const handleEncryptBtnClick = async (event: {
     preventDefault: () => void;
   }) => {
     event.preventDefault();
+    setIsEncrypting(true);
     setEncryptBtnContent(<Loader />);
     setErrorMessage("");
 
-    let requestString: string = `plaintext=${plaintext}&key=${key}&mode=${mode}`;
-    if (mode != "ECB") requestString += `&iv=${IV}`;
+    let requestString: string = `plaintext=${encodeURIComponent(plaintext)}&key=${encodeURIComponent(key)}&mode=${encodeURIComponent(mode)}`;
+    if (mode != "ECB") requestString += `&iv=${encodeURIComponent(IV)}`;
     if (triple) requestString += "&triple=true";
 
     try {
@@ -63,6 +66,7 @@ export default function DES() {
     }
 
     setEncryptBtnContent("Encrypt");
+    setIsEncrypting(false);
   };
 
   const handleDecryptBtnClick = async (event: {
@@ -70,11 +74,12 @@ export default function DES() {
   }) => {
     event.preventDefault();
     setPlaintext("");
+    setIsDecrypting(true);
     setDecryptBtnContent(<Loader />);
     setErrorMessage("");
 
-    let requestString: string = `key=${key}&mode=${mode}&ciphertext=${ciphertext}`;
-    if (mode != "ECB") requestString += `&iv=${IV}`;
+    let requestString: string = `key=${encodeURIComponent(key)}&mode=${encodeURIComponent(mode)}&ciphertext=${encodeURIComponent(ciphertext)}`;
+    if (mode != "ECB") requestString += `&iv=${encodeURIComponent(IV)}`;
     if (triple) requestString += "&triple=true";
 
     try {
@@ -92,6 +97,7 @@ export default function DES() {
     }
 
     setDecryptBtnContent("Decrypt");
+    setIsDecrypting(false);
   };
 
   const handleCiphertextChange = (event: {
@@ -141,44 +147,47 @@ export default function DES() {
         )}
       </AlgorithmHeader>
 
-      <div className="max-w-5xl m-auto">
-        <div className="grid gird-cols-1 lg:grid-cols-10 gap-x-5 md:gap-x-7 xl:gap-x-9 gap-y-7 p-1 md:p-10">
+      <div className="section-shell">
+        <div className="grid grid-cols-1 lg:grid-cols-10 gap-x-5 md:gap-x-7 xl:gap-x-9 gap-y-7 p-1 md:p-10">
           <div className="item col-span-5">
-            <label className="block mb-3 text-slate-300">
+            <label htmlFor="des-plaintext" className="form-label">
               Plaintext (64 bit blocks)
             </label>
 
             <input
+              id="des-plaintext"
               name="plaintext"
               type="text"
               value={plaintext}
               onChange={handlePlaintextChange}
-              className="bg-slate-900 border rounded-lg p-2 w-[100%] border-slate-500"
+              className="form-control"
             />
           </div>
 
           <div className="item col-span-4">
-            <label className="block mb-3 text-slate-300">
+            <label htmlFor="des-key" className="form-label">
               Key ({triple ? 168 : 56} bit)
             </label>
 
             <input
+              id="des-key"
               name="key"
               type="text"
               value={key}
               onChange={handleKeyChange}
               maxLength={triple ? undefined : 8}
-              className="bg-slate-900 border rounded-lg p-2 w-[100%] border-slate-500"
+              className="form-control"
             />
           </div>
 
           <div className="item col-span-1">
-            <label className="block mb-3 text-slate-300">Mode</label>
+            <label htmlFor="des-mode" className="form-label">Mode</label>
 
             <select
+              id="des-mode"
               value={mode}
               onChange={handleModeChange}
-              className="text-slate-200 w-[100%] px-1 py-2 border border-solid border-slate-500 rounded-lg bg-slate-900"
+              className="form-control"
             >
               {Constants.modes.map((mode) => {
                 return (
@@ -194,15 +203,16 @@ export default function DES() {
         {mode != "ECB" && (
           <div className="flex justify-center">
             <div className="mb-0 md:mb-10 mt-6 md:mt-0">
-              <label className="block mb-3 text-slate-300">
+              <label htmlFor="des-iv" className="form-label">
                 Initialization Vector (IV)
               </label>
               <input
+                id="des-iv"
                 name="iv"
                 value={IV}
                 onChange={handleIVChange}
                 type="text"
-                className="bg-slate-900 border rounded-lg p-2 border-slate-500 w-[80vw] md:w-[40vw]"
+                className="form-control w-[80vw] md:w-[40vw]"
               />
             </div>
           </div>
@@ -211,14 +221,16 @@ export default function DES() {
         <div className="block text-center">
           <button
             onClick={handleEncryptBtnClick}
-            className="block md:inline border border-solid border-gray-600 rounded-lg bg-gray-800 hover:text-white hover:bg-gray-700 px-20 py-2 mt-10 md:mt-0 font-medium m-auto"
+            className="btn-primary block md:inline m-auto mt-10 md:mt-0"
+            disabled={isEncrypting || !plaintext || !key || (mode !== "ECB" && !IV)}
           >
             {encryptBtnContent}
           </button>
 
           <button
             onClick={handleDecryptBtnClick}
-            className="block md:inline md:ml-5 border border-solid border-gray-600 rounded-lg bg-gray-800 hover:text-white hover:bg-gray-700 px-20 py-2 mt-10 md:mt-0 font-medium m-auto"
+            className="btn-secondary block md:inline md:ml-5 m-auto mt-4 md:mt-0"
+            disabled={isDecrypting || !ciphertext || !key || (mode !== "ECB" && !IV)}
           >
             {decryptBtnContent}
           </button>
@@ -228,15 +240,16 @@ export default function DES() {
 
         <div className="flex justify-center">
           <div className="mt-9">
-            <label className="block mb-3 text-slate-300">
-              Cyphertext (Hex)
+            <label htmlFor="des-ciphertext" className="form-label">
+              Ciphertext (Hex)
             </label>
             <input
+              id="des-ciphertext"
               name="ciphertext"
               value={ciphertext}
               onChange={handleCiphertextChange}
               type="text"
-              className="bg-slate-900 border rounded-lg p-2 border-slate-500 w-[80vw] md:w-[40vw]"
+              className="form-control w-[80vw] md:w-[40vw]"
             />
           </div>
         </div>

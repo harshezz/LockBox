@@ -1,7 +1,6 @@
 "use client";
 
 import { SetStateAction, useState } from "react";
-import Head from "next/head";
 import Layout from "../../components/layout/Layout";
 import AlgorithmHeader from "../../components/ui/AlgorithmHeader";
 import ErrorMessage from "../../components/ui/ErrorMessage";
@@ -14,10 +13,12 @@ export default function MD5() {
   const [hashBtnContent, setHashBtnContent] = useState<string | JSX.Element>(
     "Hash"
   );
+  const [isHashing, setIsHashing] = useState<boolean>(false);
 
   const handleHashBtnClick = async (event: { preventDefault: () => void }) => {
     event.preventDefault();
     setErrorMessage("");
+    setIsHashing(true);
     setHashBtnContent(<Loader />);
 
     try {
@@ -35,6 +36,7 @@ export default function MD5() {
     }
 
     setHashBtnContent("Hash");
+    setIsHashing(false);
   };
 
   const handlePlaintextChange = (event: {
@@ -46,12 +48,6 @@ export default function MD5() {
   }) => setHash(event.target.value);
 
   return (
-    <>
-      {/* Page title fix for client component */}
-      <Head>
-        <title>MD5 | encryptia</title>
-      </Head>
-
       <Layout>
         <AlgorithmHeader name="MD5">
           <p>
@@ -74,33 +70,35 @@ export default function MD5() {
           </p>
         </AlgorithmHeader>
 
-        <div className="max-w-3xl m-auto">
-          <label className="block mb-3 text-slate-300">Plaintext</label>
+        <div className="section-shell max-w-3xl">
+          <label htmlFor="md5-plaintext" className="form-label">Plaintext</label>
 
           <textarea
-            className="bg-transparent border border-solid rounded-lg border-slate-500 w-full p-2 h-28 max-h-52 mb-5"
+            id="md5-plaintext"
+            className="form-control h-28 max-h-52 mb-5"
             value={plaintext}
             onChange={handlePlaintextChange}
           />
 
           <button
-            className="block border border-solid border-gray-600 rounded-lg bg-gray-800 hover:text-white hover:bg-gray-700 px-14 py-2 font-medium m-auto mt-5 mb-5"
+            className="btn-primary block m-auto mt-5 mb-5"
             onClick={handleHashBtnClick}
+            disabled={isHashing || !plaintext}
           >
             {hashBtnContent}
           </button>
 
           {errorMessage}
 
-          <label className="block mb-3 text-slate-300">Hash</label>
+          <label htmlFor="md5-hash" className="form-label">Hash</label>
 
           <textarea
-            className="bg-transparent border border-solid rounded-lg border-slate-500 w-full p-2 h-28 max-h-52 mb-5"
+            id="md5-hash"
+            className="form-control h-28 max-h-52 mb-5"
             value={hash}
             onChange={handleHashChange}
           />
         </div>
       </Layout>
-    </>
   );
 }

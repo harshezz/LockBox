@@ -2,17 +2,16 @@
 
 import { useSearchParams } from "next/navigation";
 import { SetStateAction, useEffect, useState } from "react";
-import Head from "next/head";
 import Layout from "../../components/layout/Layout";
 import AlgorithmHeader from "../../components/ui/AlgorithmHeader";
 import ErrorMessage from "../../components/ui/ErrorMessage";
 import Loader from "../../components/ui/Loader";
 import * as Constants from "../../utils/constants";
 
-export default function SHA() {
+  export default function SHA() {
   const searchParams = useSearchParams();
-  const searchV: string = searchParams.get("v");
-  const [shaVariant, setShaVariant] = useState<string>("");
+  const searchV: string | null = searchParams?.get("v") ?? null;
+  const [shaVariant, setShaVariant] = useState<string>(Constants.SHAVariants[0]);
 
   useEffect(() => {
     if (!searchV) return;
@@ -29,10 +28,12 @@ export default function SHA() {
   const [hashBtnContent, setHashBtnContent] = useState<string | JSX.Element>(
     "Hash"
   );
+  const [isHashing, setIsHashing] = useState<boolean>(false);
 
   const handleHashBtnClick = async (event: { preventDefault: () => void }) => {
     event.preventDefault();
     setErrorMessage("");
+    setIsHashing(true);
     setHashBtnContent(<Loader />);
 
     const request = `/api/sha?plaintext=${encodeURIComponent(
@@ -53,6 +54,7 @@ export default function SHA() {
     }
 
     setHashBtnContent("Hash");
+    setIsHashing(false);
   };
 
   const handlePlaintextChange = (event: {
@@ -68,12 +70,6 @@ export default function SHA() {
   }) => setShaVariant(event.target.value);
 
   return (
-    <>
-      {/* Fix metadata error: use Head instead */}
-      <Head>
-        <title>SHA | encryptia</title>
-      </Head>
-
       <Layout>
         <AlgorithmHeader name="SHA">
           <p>
@@ -93,18 +89,19 @@ export default function SHA() {
           </p>
         </AlgorithmHeader>
 
-        <div className="max-w-3xl m-auto">
-          <label className="block mb-3 text-slate-300">Plaintext</label>
+        <div className="section-shell max-w-3xl">
+          <label htmlFor="sha-plaintext" className="form-label">Plaintext</label>
 
           <textarea
-            className="bg-transparent border border-solid rounded-lg border-slate-500 w-full p-2 h-28 max-h-52 mb-5"
+            id="sha-plaintext"
+            className="form-control h-28 max-h-52 mb-5"
             value={plaintext}
             onChange={handlePlaintextChange}
           />
 
           <div className="text-center">
             <select
-              className="inline text-slate-200 px-1 py-2 border border-solid border-slate-500 rounded-lg bg-slate-900 mr-3 mb-5 md:mb-0"
+              className="form-control inline w-auto mr-3 mb-5 md:mb-0"
               value={shaVariant}
               onChange={handleShaVersionChange}
             >
@@ -116,8 +113,9 @@ export default function SHA() {
             </select>
 
             <button
-              className="inline border border-solid border-gray-600 rounded-lg bg-gray-800 hover:text-white hover:bg-gray-700 px-14 py-2 font-medium m-auto mt-5 mb-5"
+              className="btn-primary inline m-auto mt-5 mb-5"
               onClick={handleHashBtnClick}
+              disabled={isHashing || !plaintext}
             >
               {hashBtnContent}
             </button>
@@ -125,15 +123,15 @@ export default function SHA() {
 
           {errorMessage}
 
-          <label className="block mb-3 text-slate-300">Hash</label>
+          <label htmlFor="sha-hash" className="form-label">Hash</label>
 
           <textarea
-            className="bg-transparent border border-solid rounded-lg border-slate-500 w-full p-2 h-28 max-h-52 mb-5"
+            id="sha-hash"
+            className="form-control h-28 max-h-52 mb-5"
             value={hash}
             onChange={handleHashChange}
           />
         </div>
       </Layout>
-    </>
   );
 }

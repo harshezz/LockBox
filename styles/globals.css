@@ -2,173 +2,87 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ===== AMOLED theme with cyan accents ===== */
 @layer base {
   :root {
-    --cyan: 64, 224, 255; /* rgb(64,224,255) — tune to taste */
-    --cyan-hex: #40e0ff;
+    --cyan: 56, 189, 248;
+    --surface: 15, 23, 42;
+    --surface-elevated: 17, 24, 39;
+    --border: 71, 85, 105;
+    --text-muted: 148, 163, 184;
   }
 
   html,
   body {
-    @apply min-h-screen antialiased;
+    @apply min-h-screen antialiased bg-black;
   }
 
   body {
-    @apply bg-black text-slate-100;
+    @apply text-slate-100;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    line-height: 1.6;
+    line-height: 1.55;
     font-feature-settings: "liga" 1;
     text-rendering: optimizeLegibility;
   }
 
-  /* links use cyan accent */
   a {
-    color: rgb(var(--cyan));
-    text-decoration-thickness: 1px;
+    text-decoration-thickness: 1.5px;
     text-underline-offset: 3px;
-  }
-  a:hover {
-    color: color-mix(in srgb, rgb(var(--cyan)) 85%, white 15%);
-  }
-
-  h1,
-  h2,
-  h3,
-  h4 {
-    @apply text-slate-50;
-    margin: 0;
-    line-height: 1.12;
-    letter-spacing: -0.01em;
   }
 
   input,
   textarea,
   select {
-    @apply bg-black border text-slate-100 rounded-md px-3 py-2;
-    border-color: rgba(60, 60, 60, 1);
-    transition: box-shadow 0.12s ease, border-color 0.12s ease,
-      transform 0.05s ease;
+    @apply text-slate-100 rounded-lg px-3 py-2 bg-slate-950 border border-slate-600;
+    transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease;
+  }
+
+  input:focus,
+  textarea:focus,
+  select:focus {
+    @apply outline-none border-sky-400;
+    box-shadow: 0 0 0 3px rgba(var(--cyan), 0.25);
   }
 
   button {
-    @apply cursor-pointer;
-  }
-
-  code,
-  pre {
-    @apply rounded-md p-1 text-sm font-mono text-slate-100;
-    background-color: rgba(10, 10, 10, 0.9);
+    @apply cursor-pointer focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
   }
 }
 
-/* ===== Components ===== */
 @layer components {
-  .container-fixed {
-    @apply max-w-6xl mx-auto px-4 sm:px-6 md:px-8;
+  .card-link {
+    @apply block rounded-2xl border-2 border-slate-700 bg-slate-950/70 px-5 py-4 text-slate-300 transition-all duration-200 hover:-translate-y-0.5 hover:border-sky-400 hover:text-slate-50 hover:shadow-[0_12px_35px_rgba(2,6,23,0.65)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400 focus-visible:ring-offset-2 focus-visible:ring-offset-black;
   }
 
-  /* AMOLED glass card */
-  .card {
-    background-color: rgba(10, 10, 10, 0.78);
-    border: 1px solid rgba(100, 100, 100, 0.6);
-    border-radius: 1rem;
-    padding: 1.5rem;
-    backdrop-filter: blur(6px);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.85);
+  .card-link-header {
+    @apply relative border-b border-slate-700 pb-3;
   }
 
-  .panel {
-    background-color: rgba(10, 10, 10, 0.92);
-    border: 1px solid rgba(100, 100, 100, 0.7);
-    border-radius: 1rem;
-    padding: 1.5rem;
-    backdrop-filter: blur(8px);
-    box-shadow: 0 12px 38px rgba(0, 0, 0, 0.9);
+  .card-link-title {
+    @apply inline font-bold text-xl pl-3 border-l border-slate-700 align-middle;
   }
 
-  /* primary button — cyan accent */
-  .btn {
-    @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium text-black;
-    background-color: rgb(var(--cyan));
-    border: 1px solid rgba(64, 224, 255, 0.1);
-    transition: transform 0.08s ease, box-shadow 0.12s ease, filter 0.12s;
-    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.7);
-  }
-  .btn:hover {
-    filter: brightness(0.93);
-    transform: translateY(-1px);
-  }
-  .btn:active {
-    transform: translateY(1px) scale(0.995);
+  .form-label {
+    @apply block mb-3 text-slate-200 font-medium;
   }
 
-  /* ghost button */
-  .btn-ghost {
-    @apply inline-flex items-center gap-2 px-4 py-2 rounded-lg border text-slate-100 bg-transparent;
-    border-color: rgba(90, 90, 90, 1);
-    transition: background-color 0.15s, color 0.15s;
-  }
-  .btn-ghost:hover {
-    background-color: rgba(64, 224, 255, 0.08);
-    color: rgb(var(--cyan));
+  .form-control {
+    @apply w-full;
   }
 
-  .divider {
-    @apply h-px my-6 w-full;
-    background-color: rgba(90, 90, 90, 0.85);
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 min-h-10 px-8 py-2 rounded-lg border border-slate-500 bg-slate-800 text-slate-100 font-medium transition-all duration-200 hover:bg-sky-500 hover:border-sky-400 hover:text-slate-950 disabled:opacity-65 disabled:cursor-not-allowed;
   }
 
-  .muted {
-    @apply text-sm;
-    color: rgba(160, 160, 160, 0.75);
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 min-h-10 px-8 py-2 rounded-lg border border-slate-600 bg-transparent text-slate-100 font-medium transition-all duration-200 hover:bg-slate-800/80 disabled:opacity-65 disabled:cursor-not-allowed;
   }
 
-  .focus-soft:focus {
-    outline: none;
-    box-shadow: 0 0 0 6px rgba(var(--cyan), 0.07);
-  }
-}
-
-/* ===== Utilities ===== */
-@layer utilities {
-  .text-quiet {
-    color: rgba(160, 160, 160, 1);
+  .section-shell {
+    @apply max-w-5xl m-auto rounded-2xl border border-slate-800 bg-slate-950/35 p-3 md:p-8;
   }
 
-  .shadow-soft {
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.8);
-  }
-
-  .caps {
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-size: 0.75rem;
-  }
-
-  .mono-badge {
-    @apply inline-flex items-center gap-2 text-xs px-2 py-1 rounded-full text-black;
-    background-color: rgba(64, 224, 255, 0.18);
-    border: 1px solid rgba(64, 224, 255, 0.1);
-  }
-}
-
-/* ===== Responsive tweaks ===== */
-@media (max-width: 720px) {
-  .card {
-    padding: 1rem;
-    border-radius: 0.75rem;
-  }
-  .panel {
-    padding: 1rem;
-    border-radius: 0.75rem;
-  }
-  .btn,
-  .btn-ghost {
-    padding-left: 1.25rem;
-    padding-right: 1.25rem;
-    padding-top: 0.75rem;
-    padding-bottom: 0.75rem;
+  .error-text {
+    @apply mt-5 text-rose-400 font-medium text-center;
   }
 }

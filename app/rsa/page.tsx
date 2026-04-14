@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import Head from "next/head";
 import Layout from "../../components/layout/Layout";
 import AlgorithmHeader from "../../components/ui/AlgorithmHeader";
 import ErrorMessage from "../../components/ui/ErrorMessage";
@@ -25,18 +24,17 @@ export default function RSA() {
   const [decryptBtnContent, setDecryptBtnContent] = useState<
     string | JSX.Element
   >("Decrypt");
+  const [isGeneratingKeys, setIsGeneratingKeys] = useState<boolean>(false);
+  const [isEncrypting, setIsEncrypting] = useState<boolean>(false);
+  const [isDecrypting, setIsDecrypting] = useState<boolean>(false);
 
-  // fallback keys if Constants.bitsMap is not present
-  const keys: string[] = Array.from(
-    (Constants as any).bitsMap
-      ? Array.from((Constants as any).bitsMap.keys())
-      : ["1024", "2048", "4096"]
-  );
+  const keys: string[] = Array.from(Constants.bitsMap.keys());
 
   const handleGenerateKeysBtnClick = async (
     event: React.MouseEvent<HTMLButtonElement>
   ) => {
     event.preventDefault();
+    setIsGeneratingKeys(true);
     setGenerateKeysBtnContent(<Loader />);
     setErrorMessage("");
 
@@ -57,6 +55,7 @@ export default function RSA() {
     }
 
     setGenerateKeysBtnContent("Generate Keys");
+    setIsGeneratingKeys(false);
   };
 
   const handleEncryptBtnClick = async (
@@ -64,6 +63,7 @@ export default function RSA() {
   ) => {
     event.preventDefault();
     setErrorMessage("");
+    setIsEncrypting(true);
     setEncryptBtnContent(<Loader />);
 
     try {
@@ -93,12 +93,14 @@ export default function RSA() {
     }
 
     setEncryptBtnContent("Encrypt");
+    setIsEncrypting(false);
   };
 
   const handleDecryptBtnClick = async (
     event: React.MouseEvent<HTMLButtonElement>
   ) => {
     event.preventDefault();
+    setIsDecrypting(true);
     setDecryptBtnContent(<Loader />);
     setErrorMessage("");
 
@@ -129,14 +131,10 @@ export default function RSA() {
     }
 
     setDecryptBtnContent("Decrypt");
+    setIsDecrypting(false);
   };
 
   return (
-    <>
-      <Head>
-        <title>RSA | encryptia</title>
-      </Head>
-
       <Layout>
         <AlgorithmHeader name="Rivest-Shamir-Adleman">
           RSA is a public-key cryptosystem that is widely used for secure data
@@ -159,20 +157,22 @@ export default function RSA() {
           directly.
         </AlgorithmHeader>
 
-        <div className="max-w-5xl m-auto">
-          <div className="grid grid-cols-0 sm:grid-cols-2 gap-6 mb-5">
+        <div className="section-shell">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-5">
             <div className="item">
-              <label className="block mb-3 text-slate-300">Public Key</label>
+              <label htmlFor="rsa-public-key" className="form-label">Public Key</label>
               <textarea
-                className="bg-transparent border border-solid rounded-lg border-slate-500 w-full p-2 h-28 max-h-52"
+                id="rsa-public-key"
+                className="form-control h-28 max-h-52"
                 value={publicKey}
                 onChange={(e) => setPublicKey(e.target.value)}
               />
             </div>
             <div className="item">
-              <label className="block mb-3 text-slate-300">Private Key</label>
+              <label htmlFor="rsa-private-key" className="form-label">Private Key</label>
               <textarea
-                className="bg-transparent border border-solid rounded-lg border-slate-500 w-full p-2 h-28 max-h-52"
+                id="rsa-private-key"
+                className="form-control h-28 max-h-52"
                 value={privateKey}
                 onChange={(e) => setPrivateKey(e.target.value)}
               />
@@ -181,7 +181,7 @@ export default function RSA() {
 
           <div className="text-center">
             <select
-              className="inline text-slate-200 px-1 py-2 border border-solid border-slate-500 rounded-lg bg-slate-900 mr-3 mb-5 md:mb-0"
+              className="form-control inline w-auto mr-3 mb-5 md:mb-0"
               value={bits}
               onChange={(e) => setBits(e.target.value)}
             >
@@ -193,24 +193,26 @@ export default function RSA() {
             </select>
 
             <button
-              className="inline border border-solid border-gray-600 rounded-lg bg-gray-800 hover:text-white hover:bg-gray-700 px-3 sm:px-10 py-2 font-medium m-auto"
+              className="btn-primary inline px-3 sm:px-10 m-auto"
               onClick={handleGenerateKeysBtnClick}
+              disabled={isGeneratingKeys}
             >
               {generateKeysBtnContent}
             </button>
           </div>
 
           <div className="mt-7">
-            <label className="block mb-3 text-slate-300">Plaintext</label>
+            <label htmlFor="rsa-plaintext" className="form-label">Plaintext</label>
             <textarea
-              className="bg-transparent border border-solid rounded-lg border-slate-500 w-full p-2 h-28 max-h-52 mb-5"
+              id="rsa-plaintext"
+              className="form-control h-28 max-h-52 mb-5"
               value={plaintext}
               onChange={(e) => setPlaintext(e.target.value)}
             />
 
             <div className="text-center mb-5 grid grid-cols-1 md:grid-cols-3 w-2/3 lg:w-1/2 m-auto gap-y-5">
               <select
-                className="inline text-slate-200 px-1 py-2 border border-solid border-slate-500 mx-3 rounded-lg bg-slate-900"
+                className="form-control inline mx-3"
                 value={encryptMethod}
                 onChange={(e) => setEncryptMethod(e.target.value)}
               >
@@ -219,15 +221,17 @@ export default function RSA() {
               </select>
 
               <button
-                className="inline border border-solid border-gray-600 rounded-lg bg-gray-800 hover:text-white hover:bg-gray-700 px-10 py-2 font-medium m-auto"
+                className="btn-primary inline px-10 m-auto"
                 onClick={handleEncryptBtnClick}
+                disabled={isEncrypting || !plaintext || (encryptMethod === "Public Key" ? !publicKey : !privateKey)}
               >
                 {encryptBtnContent}
               </button>
 
               <button
-                className="inline border border-solid border-gray-600 rounded-lg bg-gray-800 hover:text-white hover:bg-gray-700 px-10 py-2 font-medium m-auto"
+                className="btn-secondary inline px-10 m-auto"
                 onClick={handleDecryptBtnClick}
+                disabled={isDecrypting || !ciphertext || (encryptMethod === "Public Key" ? !publicKey : !privateKey)}
               >
                 {decryptBtnContent}
               </button>
@@ -235,15 +239,15 @@ export default function RSA() {
 
             {errorMessage}
 
-            <label className="block mb-3 text-slate-300">Ciphertext</label>
+            <label htmlFor="rsa-ciphertext" className="form-label">Ciphertext</label>
             <textarea
-              className="bg-transparent border border-solid rounded-lg border-slate-500 w-full p-2 h-28 max-h-52 mb-5"
+              id="rsa-ciphertext"
+              className="form-control h-28 max-h-52 mb-5"
               value={ciphertext}
               onChange={(e) => setCiphertext(e.target.value)}
             />
           </div>
         </div>
       </Layout>
-    </>
   );
 }

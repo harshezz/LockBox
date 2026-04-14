@@ -8,7 +8,9 @@ import HashCard from "../components/ui/HashCard";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "LockBox",
+  title: "LockBox | Encryption and Hashing Toolkit",
+  description:
+    "Encrypt and hash text with AES, DES, RSA, SHA, and MD5 through a clean, developer-friendly interface and API.",
 };
 
 export default function Page() {

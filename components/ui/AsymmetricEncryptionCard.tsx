@@ -7,7 +7,6 @@ import ShieldIcon from "../icons/ShieldIcon";
 import BookIcon from "../icons/BookIcon";
 
 type Props = {
-  // Corrected Props type to match the symmetric card's flexible destination type
   destination:
     | string
     | {
@@ -28,38 +27,21 @@ export default function AsymmetricEncryptionCard({
   securityLevel,
 }: Props) {
   return (
-    <Link href={destination}>
-      <div
-        // Reverting to original dark theme slate classes
-        className="cursor-pointer border-solid border-2 rounded-2xl 
-                   border-slate-600 
-                   hover:border-slate-400 
-                   mb-10 px-5 py-4 
-                   text-slate-500 
-                   hover:text-slate-50 
-                   ease-linear duration-200"
-      >
-        <div
-          // Reverting to original dark theme slate classes
-          className="relative border-solid border-b-[1px] pb-3 border-slate-700 "
-        >
+    <Link href={destination} className="card-link">
+      <article>
+        <div className="card-link-header">
           <LockIcon />
 
-          <div
-            className="inline font-bold text-xl pl-3 border-solid border-l-[1px] 
-                       // Reverting to original dark theme slate classes
-                       border-slate-700 
-                       align-middle"
-          >
+          <div className="card-link-title">
             {shortName}
           </div>
 
           <RightArrowIcon />
         </div>
 
-        <div className="my-3 font-semibold">{name}</div>
+        <div className="my-3 font-semibold text-slate-100">{name}</div>
 
-        <div className=" font-semibold">
+        <div className="font-semibold text-slate-300">
           <div className="mb-2">
             <KeyIcon />
 
@@ -76,7 +58,7 @@ export default function AsymmetricEncryptionCard({
             <span className="align-middle">Asymmetric</span>
           </div>
         </div>
-      </div>
+      </article>
     </Link>
   );
 }

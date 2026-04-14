@@ -16,7 +16,7 @@ type Event = {
 
 export default function AES() {
   const searchParams = useSearchParams();
-  const searchBits: string | null = searchParams.get("bits");
+  const searchBits: string | null = searchParams?.get("bits") ?? null;
   const [variant, setVariant] = useState<string>("128");
 
   useEffect(() => {
@@ -38,6 +38,8 @@ export default function AES() {
     string | JSX.Element
   >("Decrypt");
   const [errorMessage, setErrorMessage] = useState<string | JSX.Element>("");
+  const [isEncrypting, setIsEncrypting] = useState<boolean>(false);
+  const [isDecrypting, setIsDecrypting] = useState<boolean>(false);
 
   const handleCiphertextChange = (event: Event) =>
     setCiphertext(event.target.value);
@@ -50,11 +52,14 @@ export default function AES() {
     preventDefault: () => void;
   }) => {
     event.preventDefault();
+    setIsEncrypting(true);
     setEncryptBtnContent(<Loader />);
     setErrorMessage("");
 
     try {
-      const res = await fetch(`/api/aes?plaintext=${plaintext}&key=${key}`);
+      const res = await fetch(
+        `/api/aes?plaintext=${encodeURIComponent(plaintext)}&key=${encodeURIComponent(key)}`
+      );
       const data = await res.json();
 
       if (res.status === 200) {
@@ -69,17 +74,21 @@ export default function AES() {
     }
 
     setEncryptBtnContent("Encrypt");
+    setIsEncrypting(false);
   };
 
   const handleDecryptBtnClick = async (event: {
     preventDefault: () => void;
   }) => {
     event.preventDefault();
+    setIsDecrypting(true);
     setDecryptBtnContent(<Loader />);
     setErrorMessage("");
 
     try {
-      const res = await fetch(`/api/aes?ciphertext=${ciphertext}&key=${key}`);
+      const res = await fetch(
+        `/api/aes?ciphertext=${encodeURIComponent(ciphertext)}&key=${encodeURIComponent(key)}`
+      );
       const data = await res.json();
 
       if (res.status === 200) {
@@ -94,6 +103,7 @@ export default function AES() {
     }
 
     setDecryptBtnContent("Decrypt");
+    setIsDecrypting(false);
   };
 
   return (
@@ -114,40 +124,43 @@ export default function AES() {
         predecessor DES, AES does not use a Feistel network.
       </AlgorithmHeader>
 
-      <div className="max-w-5xl m-auto">
+      <div className="section-shell">
         <div className="grid grid-cols-1 lg:grid-cols-10 gap-x-5 md:gap-x-7 xl:gap-x-9 gap-y-7 p-1 md:p-10">
           <div className="item col-span-5">
-            <label className="block mb-3 text-slate-300">
+            <label htmlFor="aes-plaintext" className="form-label">
               Plaintext (128 bit blocks)
             </label>
             <input
+              id="aes-plaintext"
               name="plaintext"
               type="text"
               value={plaintext}
               onChange={handlePlaintextChange}
-              className="bg-slate-900 border rounded-lg p-2 w-full border-slate-500"
+               className="form-control"
             />
           </div>
 
           <div className="item col-span-4">
-            <label className="block mb-3 text-slate-300">
+            <label htmlFor="aes-key" className="form-label">
               Key ({variant} bit)
             </label>
             <input
+              id="aes-key"
               name="key"
               type="text"
               value={key}
               onChange={handleKeyChange}
-              className="bg-slate-900 border rounded-lg p-2 w-full border-slate-500"
+               className="form-control"
             />
           </div>
 
           <div className="item col-span-1">
-            <label className="block mb-3 text-slate-300">Variant</label>
+            <label htmlFor="aes-variant" className="form-label">Variant</label>
             <select
+              id="aes-variant"
               value={variant}
               onChange={handleVariantChange}
-              className="text-slate-200 w-full px-1 py-2 border border-solid border-slate-500 rounded-lg bg-slate-900"
+              className="form-control"
             >
               <option>128</option>
               <option>192</option>
@@ -159,14 +172,16 @@ export default function AES() {
         <div className="block text-center">
           <button
             onClick={handleEncryptBtnClick}
-            className="block md:inline border border-solid border-gray-600 rounded-lg bg-gray-800 hover:text-white hover:bg-gray-700 px-20 py-2 mt-10 md:mt-0 font-medium m-auto"
+            className="btn-primary block md:inline m-auto mt-10 md:mt-0"
+            disabled={isEncrypting || !plaintext || !key}
           >
             {encryptBtnContent}
           </button>
 
           <button
             onClick={handleDecryptBtnClick}
-            className="block md:inline md:ml-5 border border-solid border-gray-600 rounded-lg bg-gray-800 hover:text-white hover:bg-gray-700 px-20 py-2 mt-10 md:mt-0 font-medium m-auto"
+            className="btn-secondary block md:inline md:ml-5 m-auto mt-4 md:mt-0"
+            disabled={isDecrypting || !ciphertext || !key}
           >
             {decryptBtnContent}
           </button>
@@ -176,15 +191,16 @@ export default function AES() {
 
         <div className="flex justify-center">
           <div className="mt-9">
-            <label className="block mb-3 text-slate-300">
+            <label htmlFor="aes-ciphertext" className="form-label">
               Ciphertext (Encoded in Base64)
             </label>
             <input
+              id="aes-ciphertext"
               name="ciphertext"
               value={ciphertext}
               onChange={handleCiphertextChange}
               type="text"
-              className="bg-slate-900 border rounded-lg p-2 border-slate-500 w-[80vw] md:w-[40vw]"
+              className="form-control w-[80vw] md:w-[40vw]"
             />
           </div>
         </div>
