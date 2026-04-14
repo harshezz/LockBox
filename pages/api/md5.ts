@@ -1,10 +1,6 @@
 import CryptoJS from "crypto-js"
 import { NextApiRequest, NextApiResponse } from "next"
-
-const readParam = (value: string | string[] | undefined): string => {
-    if(Array.isArray(value)) return value[0] ?? ''
-    return value ?? ''
-}
+import { readParam } from "../../utils/readParam"
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
     if(req.method == 'GET'){

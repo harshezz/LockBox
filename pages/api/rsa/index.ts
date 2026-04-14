@@ -1,12 +1,8 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import rsa from "node-rsa";
+import { readParam } from "../../../utils/readParam";
 
-const readParam = (value: string | string[] | undefined): string => {
-  if (Array.isArray(value)) return value[0] ?? "";
-  return value ?? "";
-};
-
-const decodeParam = (value: string): string =>
+const decodeQueryParam = (value: string): string =>
   decodeURIComponent(value).replace(/%2b/g, "+");
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
@@ -30,31 +26,31 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       }
 
       if (publicKey) {
-        const publicKeyObj = new rsa().importKey(decodeParam(publicKey));
+        const publicKeyObj = new rsa().importKey(decodeQueryParam(publicKey));
 
         if (plaintext) {
           return res.status(200).json({
-            plaintext: decodeParam(plaintext),
-            ciphertext: publicKeyObj.encrypt(decodeParam(plaintext), "base64"),
+            plaintext: decodeQueryParam(plaintext),
+            ciphertext: publicKeyObj.encrypt(decodeQueryParam(plaintext), "base64"),
             publicKey: publicKeyObj.exportKey("public"),
           });
         }
 
         return res.status(200).json({
-          plaintext: publicKeyObj.decryptPublic(decodeParam(ciphertext), "utf8"),
-          ciphertext: decodeParam(ciphertext),
+          plaintext: publicKeyObj.decryptPublic(decodeQueryParam(ciphertext), "utf8"),
+          ciphertext: decodeQueryParam(ciphertext),
           publicKey: publicKeyObj.exportKey("public"),
         });
       }
 
       if (privateKey) {
-        const privateKeyObj = new rsa().importKey(decodeParam(privateKey));
+        const privateKeyObj = new rsa().importKey(decodeQueryParam(privateKey));
 
         if (plaintext) {
           return res.status(200).json({
-            plaintext: decodeParam(plaintext),
+            plaintext: decodeQueryParam(plaintext),
             ciphertext: privateKeyObj.encryptPrivate(
-              decodeParam(plaintext),
+              decodeQueryParam(plaintext),
               "base64"
             ),
             privateKey: privateKeyObj.exportKey("private"),
@@ -62,8 +58,8 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
         }
 
         return res.status(200).json({
-          plaintext: privateKeyObj.decrypt(decodeParam(ciphertext), "utf8"),
-          ciphertext: decodeParam(ciphertext),
+          plaintext: privateKeyObj.decrypt(decodeQueryParam(ciphertext), "utf8"),
+          ciphertext: decodeQueryParam(ciphertext),
           privateKey: privateKeyObj.exportKey("private"),
         });
       }
